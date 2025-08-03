@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define pinSensorHall 7
+#define pinSensorHall 8
 #define pinRele 10
 
 const int BOBINAS = 4;
@@ -16,7 +16,6 @@ void setup()
 {
   pinMode(pinSensorHall, INPUT_PULLUP);
   pinMode(pinRele, OUTPUT);
-  digitalWrite(pinRele, HIGH);
   Serial.begin(9600);
   Serial.println("Iniciando bobinagem...");
 }
@@ -27,6 +26,7 @@ void loop()
 
   if (sensorHall && !sensorDesativado && bobina < BOBINAS)
   {
+    digitalWrite(pinRele, HIGH);
     contadorGiros++;
     Serial.print("Espira ");
     Serial.print(contadorGiros);
@@ -37,9 +37,12 @@ void loop()
       contadorGiros = 0;
       bobinandoPrimario = false;
       Serial.println("Bobina do primário concluída.");
+      digitalWrite(pinRele, LOW);
+      delay(5000);
     }
     else if (!bobinandoPrimario && contadorGiros >= ESPIRAS_SECUNDARIO)
     {
+      digitalWrite(pinRele, HIGH);
       contadorGiros = 0;
       bobinandoPrimario = true;
       bobina++;
@@ -50,7 +53,7 @@ void loop()
 
     if (bobina >= BOBINAS)
     {
-      Serial.println("Todas as bobinas concluídas.");
+      Serial.println("Bobinas concluídas.");
       digitalWrite(pinRele, LOW);
       while (true)
         ;
